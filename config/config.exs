@@ -16,3 +16,10 @@ import Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 #
+config :auction_system, AuctionSystem.Repo,
+  database: "auction",
+  username: "auction_sytem",
+  password: "auction_sytem",
+  hostname: "localhost"
+
+config :auction_system, ecto_repos: [AuctionSystem.Repo]

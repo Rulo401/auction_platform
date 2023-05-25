@@ -10,6 +10,7 @@ defmodule AuctionSystem.Application do
     children = [
       # Starts a worker by calling: AuctionSystem.Worker.start_link(arg)
       # {AuctionSystem.Worker, arg}
+      AuctionSystem.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
