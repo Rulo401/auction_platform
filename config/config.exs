@@ -18,8 +18,8 @@ import Config
 #
 config :auction_system, AuctionSystem.Repo,
   database: "auction",
-  username: "auction_sytem",
-  password: "auction_sytem",
+  username: "auction_system",
+  password: "auction_system",
   hostname: "localhost"
 
 config :auction_system, ecto_repos: [AuctionSystem.Repo]
