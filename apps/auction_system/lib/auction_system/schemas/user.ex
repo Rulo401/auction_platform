@@ -3,7 +3,7 @@ defmodule AuctionSystem.Schemas.User do
 
   schema "user" do
     field :nickname, :string
-    field :balance, :float, default: 0
-    field :freezed, :float, default: 0
+    field :balance, :float, default: 0.0
+    field :freezed, :float, default: 0.0
   end
 end
