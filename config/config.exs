@@ -23,3 +23,5 @@ config :auction_system, AuctionSystem.Repo,
   hostname: "localhost"
 
 config :auction_system, ecto_repos: [AuctionSystem.Repo]
+
+import_config "#{config_env()}.exs"
