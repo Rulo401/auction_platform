@@ -24,6 +24,3 @@ auction_system-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
-
-# Priv files
-/priv
