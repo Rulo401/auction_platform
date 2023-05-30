@@ -43,4 +43,17 @@ defmodule AuctionSystem.Tasks.AuctionManager do
       |> NaiveDateTime.add(days, :day)
       |> NaiveDateTime.truncate(:second)
   end
+
+  def get_auction_data(pid, cid, auction_id) do
+    auc = Auction |> Repo.get(auction_id) |> Repo.preload([item: [skin: :weapon]])
+    response = %{
+      weapon: auc.item.skin.weapon.name,
+      skin: auc.item.skin.name,
+      seed: auc.item.seed,
+      skinFloat: auc.item.skinFloat,
+      bid: if is_nil(auc.bid) do auc.minBid else auc.bid end,
+      end: auc.end
+      }
+    send(pid, {:market, cid, {:ok, response}})
+  end
 end

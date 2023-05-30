@@ -159,6 +159,9 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
         refute "TIMEOUT" == "TIMEOUT"
     end
 
+    assert length(Auction |> Repo.all) == 1
+    assert length(Item |> Repo.all) == 1
+
     auc = Auction
     |> first
     |> Repo.one()
@@ -171,5 +174,42 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
     assert NaiveDateTime.compare(auc.end, NaiveDateTime.utc_now()) == :gt
     assert NaiveDateTime.compare(auc.end, NaiveDateTime.add(NaiveDateTime.utc_now(), 1, :day)) == :lt
     assert auc.minBid == 0.1
+  end
+
+  test "Get auction data" do
+    pid = self()
+
+    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 1) end)
+
+    au_id = receive do
+      {:market, cid, response} ->
+        assert cid == :test
+        {status, au_id} = response
+        assert status == :ok
+        au_id
+      after 5000 ->
+        refute "TIMEOUT" == "TIMEOUT"
+        nil
+    end
+
+    assert length(Auction |> Repo.all) == 1
+    assert length(Item |> Repo.all) == 1
+
+    spawn(fn -> AuctionManager.get_auction_data(pid, :test, au_id) end)
+
+    receive do
+      {:market, cid, response} ->
+        assert cid == :test
+        {status, map} = response
+        assert status == :ok
+        assert map.weapon == "WeaponTest"
+        assert map.skin == "Skin1"
+        assert map.seed == 20
+        assert map.skinFloat == 0.13
+        assert map.bid == 0.1
+      after 5000 ->
+        refute "TIMEOUT" == "TIMEOUT"
+        nil
+    end
   end
 end
