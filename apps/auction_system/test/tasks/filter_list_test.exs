@@ -45,6 +45,20 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
         after 1000 -> refute "timeout" == "timeout"
       end
     end
+
+    #List all skins from weapon 3 when there are no skins for the weapon
+    test "No skins for invalid Weapon" do
+      pid = self()
+      #No skins for weapon
+      spawn(fn -> FilterList.list_skins(pid, :test, 3) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid weapon or No skins for that weapon"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
   end
 
   describe "Tests with tables"do
@@ -67,8 +81,8 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
                                 (2, 'AWP', 2),
                                 (3, 'Karambit', 0);"
       ins_ski ="INSERT INTO SKINS
-  VALUES (0, 0, 453, 'Skin1', 0.1, 0.4),
-                (1, 0, 58, 'Skin2', 0.01, 0.7);"
+  VALUES (0, 0, 453, 'Vulcan', 0.1, 0.4),
+                (1, 0, 58, 'Redline', 0.01, 0.7);"
 
       #Insert data into the DB
       {:ok, _} = Repo.query(trunc)
@@ -104,6 +118,7 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
         after 1000 -> refute "timeout" == "timeout"
       end
     end
+
     #List all weapons from category 5 that doesnt exist
     test "List Weapons of Category 5" do
       pid = self()
@@ -112,6 +127,32 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
       receive do
         {:market, :test, response} ->
           assert response == {:error, "Invalid category or No weapons for that category"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #List all skins from weapon 0
+    test "List Skins of Weapon 0" do
+      pid = self()
+      spawn(fn -> FilterList.list_skins(pid, :test, 0) end)
+
+      receive do
+        {:market, :test, {:ok,response}} ->
+          assert response == [{0, "Vulcan"}, {1, "Redline"}]
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #List all skins from weapon 4 that doesnt exist
+    test "List Skins of Weapon 4" do
+      pid = self()
+      spawn(fn -> FilterList.list_skins(pid, :test, 4) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid weapon or No skins for that weapon"}
 
         after 1000 -> refute "timeout" == "timeout"
       end

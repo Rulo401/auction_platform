@@ -1,5 +1,5 @@
 defmodule AuctionSystem.Tasks.FilterList do
-  alias AuctionSystem.Schemas.{Category, Weapon}
+  alias AuctionSystem.Schemas.{Category, Weapon, Skin}
   alias AuctionSystem.Repo
   import Ecto.Query
 
@@ -19,6 +19,16 @@ defmodule AuctionSystem.Tasks.FilterList do
         {:error, "Invalid category or No weapons for that category"}
       weapons ->
         {:ok, weapons}
+    end
+    send(pid, {:market, cid, response})
+  end
+
+  def list_skins(pid,cid,weapon_id)do
+    response = case Repo.all(from s in Skin, where: s.weapon_id == ^weapon_id, select: {s.id, s.name}, order_by: [asc: s.id]) do
+      [] ->
+        {:error, "Invalid weapon or No skins for that weapon"}
+      skins ->
+        {:ok, skins}
     end
     send(pid, {:market, cid, response})
   end
