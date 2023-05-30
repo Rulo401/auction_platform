@@ -4,7 +4,7 @@ defmodule AuctionSystem.Schemas.Item do
   import Ecto.Changeset
 
   schema "items" do
-    belongs_to :skin_id, Skin
+    belongs_to :skin, Skin
     field :seed, :integer
     field :sfloat, :float
   end

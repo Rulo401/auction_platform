@@ -4,7 +4,7 @@ defmodule AuctionSystem.Schemas.Skin do
   import Ecto.Changeset
 
   schema "skins" do
-    belongs_to :weapon_id, Weapon
+    belongs_to :weapon, Weapon
     field :paint , :integer
     field :minFloat, :float
     field :maxFloat, :float
