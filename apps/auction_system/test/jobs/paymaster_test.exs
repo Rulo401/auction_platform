@@ -18,8 +18,8 @@ defmodule AuctionSystemTest.Jobs.PaymasterTest do
     ins_wea ="INSERT INTO WEAPONS
   VALUES (0, 'WeaponTest', 0);"
     ins_ski ="INSERT INTO SKINS
-  VALUES (0, 0, 453, 0.1, 0.4),
-                (1, 0, 58, 0.01, 0.7);"
+  VALUES (0, 0, 453, 'Skin1', 0.1, 0.4),
+                (1, 0, 58, 'Skin2', 0.01, 0.7);"
     ins_ite = "INSERT INTO ITEMS
   VALUES (0, 0, 30, 0.2),
                 (1, 0, 67, 0.399),
