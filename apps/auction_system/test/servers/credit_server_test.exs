@@ -6,63 +6,92 @@ defmodule AuctionSystemTest.Servers.CreditServerTest do
 
   setup do
     {_, pid} = GenServer.start_link(CreditServer, nil)
-    {:ok, server: pid}
+    init_size = length(User |> Repo.all)
+    # Create four users for testing
+    users = [
+      user1: %User{nickname: "TestUser1", balance: 20.0},
+      user2: %User{nickname: "TestUser2"},
+      user3: %User{nickname: "TestUser3"}
+     ]
+
+     # Save the user records to the database
+     users_state = users
+     |> Enum.map(fn {k,u} ->
+        {:ok, user} = Repo.insert(u)
+        {k,user}
+     end)
+     |> Map.new()
+
+    {:ok, %{users: users_state,server: pid, init_size: init_size}}
   end
 
+  #setup_all do
+  #  # Create four users for testing
+  #  users = [
+  #   user1: %User{nickname: "TestUser1", balance: 20.0},
+  #   user2: %User{nickname: "TestUser2"},
+  #   user3: %User{nickname: "TestUser3"}
+  #  ]
+#
+  #  # Save the user records to the database
+  #  users_state = users
+  #  |> Enum.map(fn {k,u} ->
+  #     {:ok, user} = Repo.insert(u)
+  #     {k,user}
+  #  end)
+  #  |> Map.new()
+#
+  #  # Return the server and users
+  #  {:ok, %{users: users_state}}
+  #end
+
   test "Balance", state do
-    init_size = length(User |> Repo.all)
-
-    # Create a user for testing
-    user = %User{nickname: "TestUser"}
-
-    # Save the user record to the database
-    {:ok, user} = Repo.insert(user)
+    # Get the first user from the setup
+    user1 = Map.get(state.users, :user1)
 
     #Check the size of the database
-    assert init_size + 1 == length(User |> Repo.all)
+    assert state.init_size + 3 == length(User |> Repo.all)
 
     # Get the user's balance
-    assert {:ok, 0} == GenServer.call(state.server, {:balance, user.id}, :infinity)
+    assert {:ok, 20} == GenServer.call(state.server, {:balance, user1.id}, :infinity)
 
     #Test with a user that doesn´t exists
-    Repo.delete(user)
-    assert {:error, "User not found"} == GenServer.call(state.server, {:balance, user.id}, :infinity)
+    assert {:error, "User not found"} == GenServer.call(state.server, {:balance, -1}, :infinity)
   end
 
   test "Deposit", state do
-    init_size = length(User |> Repo.all)
-
-    # Create a user for testing
-    user = %User{nickname: "TestUser"}
-
-    # Save the user record to the database
-    {:ok, user} = Repo.insert(user)
+    # Get the first and second user from the setup
+    user1 = Map.get(state.users, :user1)
+    user2 = Map.get(state.users, :user2)
 
     #Check the size of the database
-    assert init_size + 1 == length(User |> Repo.all)
+    assert state.init_size + 3 == length(User |> Repo.all)
 
-    # Deposit amount into the user's account
-    assert {:ok, 100} == GenServer.call(state.server, {:deposit, user.id, 100}, :infinity)
+    # Deposit amount into the user1 account
+    assert {:ok, 120} == GenServer.call(state.server, {:deposit, user1.id, 100}, :infinity)
 
+    # Deposit amount into the user2 account
+    assert {:ok, 50} == GenServer.call(state.server, {:deposit, user2.id, 50}, :infinity)
+
+    # Deposit negative amount into the user1 account
+    assert {:error, "Deposit amount must be a positive integer"} == GenServer.call(state.server, {:deposit, user1.id, -25}, :infinity)
   end
 
   test "Withdraw", state do
-    init_size = length(User |> Repo.all)
-
-    # Create a user for testing
-    user = %User{nickname: "TestUser"}
-
-    # Save the user record to the database
-    {:ok, user} = Repo.insert(user)
+    # Get the first and second user from the setup
+    user1 = Map.get(state.users, :user1)
+    user2 = Map.get(state.users, :user2)
 
     #Check the size of the database
-    assert init_size + 1 == length(User |> Repo.all)
+    assert state.init_size + 3 == length(User |> Repo.all)
 
-    # Deposit amount into the user's account
-    GenServer.call(state.server, {:deposit, user.id, 100}, :infinity)
+    # Withdraw amount from the user1 account
+    assert {:ok, 5} == GenServer.call(state.server, {:withdraw, user1.id, 15}, :infinity)
 
-    # Withdraw amount from the user's account
-    assert {:ok, 50} == GenServer.call(state.server, {:withdraw, user.id, 50}, :infinity)
+    # Withdraw negative amount into the user1 account
+    assert {:error, "Withdraw amount must be a positive integer"} == GenServer.call(state.server, {:withdraw, user1.id, -25}, :infinity)
 
+    # Withdraw amount from the user2 account with insufficient balance
+    assert {:error, "Insufficient balance"} == GenServer.call(state.server, {:withdraw, user2.id, 50}, :infinity)
   end
 end
