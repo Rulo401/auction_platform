@@ -5,6 +5,7 @@ defmodule AuctionSystem.Repo.Migrations.CreateSkin do
     create table(:skins) do
       add :weapon_id, references(:weapons), null: false
       add :paint, :integer, null: false
+      add :name, :string, null: false
       add :minFloat, :float, null: false
       add :maxFloat, :float, null: false
     end

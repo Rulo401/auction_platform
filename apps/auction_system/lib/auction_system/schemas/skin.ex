@@ -6,6 +6,7 @@ defmodule AuctionSystem.Schemas.Skin do
   schema "skins" do
     belongs_to :weapon, Weapon
     field :paint , :integer
+    field :name, :string
     field :minFloat, :float
     field :maxFloat, :float
   end
@@ -13,7 +14,7 @@ defmodule AuctionSystem.Schemas.Skin do
   def changeset(skin, params \\ %{}) do
     skin
     |> cast(params, [])
-    |> validate_required([:weapon_id, :paint, :minFloat, :maxFloat])
+    |> validate_required([:weapon_id, :paint,:name, :minFloat, :maxFloat])
     |> unique_constraint(:unique_skin, name: :index_skins_dup_entries)
   end
 end
