@@ -1,7 +1,6 @@
 defmodule AuctionSystemTest.Tasks.FilterListTest do
   use AuctionSystem.RepoCase
   alias AuctionSystem.Tasks.FilterList
-  alias AuctionSystem.Schemas.Category
   doctest FilterList
 
   describe "Empty tables Test"do

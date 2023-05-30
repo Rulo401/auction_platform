@@ -1,7 +1,7 @@
 defmodule AuctionSystemTest.Jobs.PaymasterTest do
   use AuctionSystem.RepoCase
   alias AuctionSystem.Jobs.Paymaster
-  alias AuctionSystem.Schemas.{Auction,Category,User}
+  alias AuctionSystem.Schemas.{Auction,User}
   alias AuctionSystem.Repo
   doctest Paymaster
 

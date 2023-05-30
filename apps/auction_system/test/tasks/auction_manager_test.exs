@@ -1,8 +1,7 @@
 defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
   use AuctionSystem.RepoCase
   alias AuctionSystem.Tasks.AuctionManager
-  alias AuctionSystem.Servers.UserServer
-  alias AuctionSystem.Schemas.{User, Auction, Item}
+  alias AuctionSystem.Schemas.{Auction, Item}
   alias AuctionSystem.Repo
   import Ecto.Query
   doctest AuctionManager
