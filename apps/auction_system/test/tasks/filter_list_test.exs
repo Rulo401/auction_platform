@@ -20,13 +20,27 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     end
 
     #Lists all categories in the DB
-    test "Category" do
+    test "No Categories listed" do
       pid = self()
       spawn(fn -> FilterList.list_categories(pid, :test) end)
 
       receive do
         {:market, :test, response} ->
           assert response == {:error, "No categories listed"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #List all weapons from category 2 when there are no weapons for the category
+    test "No Weapons for invalid Category" do
+      pid = self()
+      #No weapons for category
+      spawn(fn -> FilterList.list_weapons(pid, :test, 2) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid category or No weapons for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -66,13 +80,38 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     end
 
     #Lists all categories in the DB
-    test "Category" do
+    test "List Categories" do
       pid = self()
       spawn(fn -> FilterList.list_categories(pid, :test) end)
 
       receive do
         {:market, :test, {:ok,response}} ->
           assert response == [{0,"Knives"},{1,"Gloves"},{2,"Rifles"},{3,"Pistols"}]
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #List all weapons from category 2
+    test "List Weapons of Category 2" do
+      pid = self()
+      spawn(fn -> FilterList.list_weapons(pid, :test, 2) end)
+
+      receive do
+        {:market, :test, {:ok,response}} ->
+          assert response == [{0,"Ak-47"},{1,"M4A4"},{2,"AWP"}]
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+    #List all weapons from category 5 that doesnt exist
+    test "List Weapons of Category 5" do
+      pid = self()
+      spawn(fn -> FilterList.list_weapons(pid, :test, 5) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid category or No weapons for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
       end
