@@ -6,7 +6,7 @@ defmodule AuctionSystem.Schemas.Item do
   schema "items" do
     belongs_to :skin, Skin
     field :seed, :integer
-    field :sfloat, :float
+    field :skinFloat, :float
   end
 
   def changeset(skin, params \\ %{}) do
