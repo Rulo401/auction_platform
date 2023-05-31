@@ -49,7 +49,19 @@ defmodule AuctionSystem.Tasks.AuctionList do
     send(pid, {:market, cid, response})
   end
 
-  def list_auctions(_pid, _cid, :skin, _skin_id) do
-    nil
+  def list_auctions(pid, cid, :skin, skin_id) do
+    query =
+      from(a in Auction,
+        join: i in Item, on: a.item_id == i.id,
+        where: i.skin_id== ^skin_id,
+        select: a.id
+      )
+    response = case Repo.all(query) do
+      [] ->
+        {:error, "Invalid skin or No auctions listed for that skin"}
+      auctions ->
+        {:ok, auctions}
+    end
+    send(pid, {:market, cid, response})
   end
 end

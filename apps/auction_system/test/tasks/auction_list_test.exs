@@ -56,6 +56,19 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
         after 1000 -> refute "timeout" == "timeout"
       end
     end
+
+    #Lists all auctions by a skin thats not in the DB
+    test "No Auctions for Invalid skin" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 1) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid skin or No auctions listed for that skin"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
   end
 
   describe "Tests with tables" do
@@ -156,7 +169,7 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       end
     end
 
-    #Lists all auctions with weapon 7
+    #Lists all auctions with weapon 7 that doesnt exist
     test "Listed Auctions by Weapon 7" do
       pid = self()
       spawn(fn -> AuctionList.list_auctions(pid, :test, :weapon, 7) end)
@@ -164,6 +177,32 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       receive do
         {:market, :test, response} ->
           assert response == {:error, "Invalid weapon or No auctions listed for that weapon"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #Lists all auctions with skin 0
+    test "Listed Auctions by Skin 0" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 0) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:ok,[0,1]}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #Lists all auctions with skin 3 that doesnt exist
+    test "Listed Auctions by Skin 3" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 3) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid skin or No auctions listed for that skin"}
 
         after 1000 -> refute "timeout" == "timeout"
       end
