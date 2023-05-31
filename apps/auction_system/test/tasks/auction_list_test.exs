@@ -30,6 +30,19 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
         after 1000 -> refute "timeout" == "timeout"
       end
     end
+
+    #Lists all auctions by a category thats not in the DB
+    test "No Auctions for Invalid category" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 1) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid category or No auctions listed for that category"}
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
   end
 
   describe "Tests with tables" do
@@ -42,12 +55,18 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       AUCTIONS;"
 
       ins_cat = "INSERT INTO CATEGORIES
-    VALUES (0, 'CategoryTest');"
-      ins_wea ="INSERT INTO WEAPONS
-    VALUES (0, 'WeaponTest', 0);"
+  VALUES (0, 'Knives'),
+                (1, 'Gloves'),
+                (2, 'Rifles'),
+                (3, 'Pistols');"
+      ins_wea = "INSERT INTO WEAPONS
+    VALUES (0, 'Ak-47', 2),
+                                (1, 'M4A4', 2),
+                                (2, 'AWP', 2),
+                                (3, 'Karambit', 0);"
       ins_ski ="INSERT INTO SKINS
-    VALUES (0, 0, 453, 'Skin1', 0.1, 0.4),
-                  (1, 0, 58, 'Skin2', 0.01, 0.7);"
+  VALUES (0, 0, 453, 'Vulcan', 0.1, 0.4),
+                (1, 0, 58, 'Redline', 0.01, 0.7);"
       ins_ite = "INSERT INTO ITEMS
     VALUES (0, 0, 30, 0.2),
                   (1, 0, 67, 0.399),
@@ -71,6 +90,7 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
 
       :ok
     end
+
     #Lists all auctions in the DB
     test "Listed Auctions" do
       pid = self()
@@ -79,6 +99,32 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       receive do
         {:market, :test, {:ok, response}} ->
           assert response == [0,1,2]
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #Lists all auctions with weapon from category 2
+    test "Listed Auctions with Weapon from Category 2" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 2) end)
+
+      receive do
+        {:market, :test, {:ok, response}} ->
+          assert response == [0,1,2]
+
+        after 1000 -> refute "timeout" == "timeout"
+      end
+    end
+
+    #Lists all auctions with weapon from category 4 that doesnt exist
+    test "Listed Auctions with Weapon from Category 4" do
+      pid = self()
+      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 4) end)
+
+      receive do
+        {:market, :test, response} ->
+          assert response == {:error, "Invalid category or No auctions listed for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
       end
