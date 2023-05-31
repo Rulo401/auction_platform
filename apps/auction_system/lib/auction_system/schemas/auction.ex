@@ -1,5 +1,6 @@
 defmodule AuctionSystem.Schemas.Auction do
   use Ecto.Schema
+  alias AuctionSystem.Repo
   alias AuctionSystem.Schemas.User
   alias AuctionSystem.Schemas.Item
   import Ecto.Changeset
@@ -16,7 +17,8 @@ defmodule AuctionSystem.Schemas.Auction do
 
   def changeset(auction, params \\ %{}) do
     auction
-    |> cast(params, [:bidder, :bid, :end, :paid])
-    |> validate_required([:seller, :item, :minbid, :end, :paid])
+    |> Repo.preload(:bidder)
+    |> cast(params, [:bidder_id, :bid, :end, :paid])
+    |> validate_required([:seller_id, :item_id, :minBid, :end, :paid])
   end
 end
