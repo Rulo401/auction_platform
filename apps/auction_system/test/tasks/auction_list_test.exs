@@ -97,8 +97,8 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       spawn(fn -> AuctionList.list_auctions(pid, :test, :all) end)
 
       receive do
-        {:market, :test, {:ok, response}} ->
-          assert response == [0,1,2]
+        {:market, :test, response} ->
+          assert response == {:ok,[0,1,2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -110,8 +110,8 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
       spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 2) end)
 
       receive do
-        {:market, :test, {:ok, response}} ->
-          assert response == [0,1,2]
+        {:market, :test, response} ->
+          assert response == {:ok,[0,1,2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end

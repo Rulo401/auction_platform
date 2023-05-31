@@ -98,8 +98,8 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
       spawn(fn -> FilterList.list_categories(pid, :test) end)
 
       receive do
-        {:market, :test, {:ok,response}} ->
-          assert response == [{0,"Knives"},{1,"Gloves"},{2,"Rifles"},{3,"Pistols"}]
+        {:market, :test, response} ->
+          assert response == {:ok,[{0,"Knives"},{1,"Gloves"},{2,"Rifles"},{3,"Pistols"}]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -111,8 +111,8 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
       spawn(fn -> FilterList.list_weapons(pid, :test, 2) end)
 
       receive do
-        {:market, :test, {:ok,response}} ->
-          assert response == [{0,"Ak-47"},{1,"M4A4"},{2,"AWP"}]
+        {:market, :test, response} ->
+          assert response == {:ok,[{0,"Ak-47"},{1,"M4A4"},{2,"AWP"}]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -137,8 +137,8 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
       spawn(fn -> FilterList.list_skins(pid, :test, 0) end)
 
       receive do
-        {:market, :test, {:ok,response}} ->
-          assert response == [{0, "Vulcan"}, {1, "Redline"}]
+        {:market, :test, response} ->
+          assert response == {:ok,[{0, "Vulcan"}, {1, "Redline"}]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
