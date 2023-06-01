@@ -3,6 +3,7 @@ defmodule AuctionSystem.Servers.CreditServer do
   alias AuctionSystem.Schemas.User
   alias AuctionSystem.Repo
   alias Ecto.Multi
+  alias AuctionSystem.Tasks.Balance
   import Ecto.Query
 
   def start_link([supervisor]) do
@@ -64,23 +65,13 @@ defmodule AuctionSystem.Servers.CreditServer do
   def handle_call({:balance, user_id}, from, supervisor) do
     list = Supervisor.which_children(supervisor)
     ds = Enum.find_value(list, fn x -> find_ds(x) end)
-    DynamicSupervisor.start_child(ds, %{ id: CreditServer, start: {CreditServer, :balance, [from, user_id]}})
+    DynamicSupervisor.start_child(ds, %{id: Balance, start: {Balance, :balance, [from, user_id]}, restart: :temporary})
     {:noreply, supervisor}
-  end
-
-  def balance(from, user_id) do
-    response = case User |> Repo.get(user_id) do
-      nil ->
-        {:error,"User not found"}
-      user ->
-        {:ok, user.balance}
-    end
-    GenServer.reply(from, response)
   end
 
   defp find_ds(x) do
     case x do
-      {:balance_ds, child, :worker, _} ->
+      {:balance_ds, child, :supervisor, _} ->
         child
       _ ->
         false

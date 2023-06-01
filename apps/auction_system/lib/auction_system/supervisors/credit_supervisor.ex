@@ -1,11 +1,13 @@
 defmodule AuctionSystem.Supervisors.CreditSupervisor do
   use Supervisor
+  alias AuctionSystem.Servers.CreditServer
 
-  def start_link([]) do
-    Supervisor.start_link(CreditSupervisor, :ok, name: CreditSupervisor)
+  def start_link(_) do
+    Supervisor.start_link(__MODULE__, name: __MODULE__)
   end
 
-  def init(:ok) do
+  @impl true
+  def init(_) do
     children = [
       {DynamicSupervisor, name: :balance_ds, strategy: :one_for_one, max_children: 250},
       {CreditServer, [self()]}
