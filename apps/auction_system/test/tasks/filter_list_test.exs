@@ -21,10 +21,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #Lists all categories in the DB
     test "No Categories listed" do
       pid = self()
-      spawn(fn -> FilterList.list_categories(pid, :test) end)
+      spawn(fn -> FilterList.list_categories(pid) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "No categories listed"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -35,10 +35,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     test "No Weapons for invalid Category" do
       pid = self()
       #No weapons for category
-      spawn(fn -> FilterList.list_weapons(pid, :test, 2) end)
+      spawn(fn -> FilterList.list_weapons(pid, 2) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid category or No weapons for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -49,10 +49,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     test "No skins for invalid Weapon" do
       pid = self()
       #No skins for weapon
-      spawn(fn -> FilterList.list_skins(pid, :test, 3) end)
+      spawn(fn -> FilterList.list_skins(pid, 3) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid weapon or No skins for that weapon"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -95,10 +95,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #Lists all categories in the DB
     test "List Categories" do
       pid = self()
-      spawn(fn -> FilterList.list_categories(pid, :test) end)
+      spawn(fn -> FilterList.list_categories(pid) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:ok,[{0,"Knives"},{1,"Gloves"},{2,"Rifles"},{3,"Pistols"}]}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -108,10 +108,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #List all weapons from category 2
     test "List Weapons of Category 2" do
       pid = self()
-      spawn(fn -> FilterList.list_weapons(pid, :test, 2) end)
+      spawn(fn -> FilterList.list_weapons(pid, 2) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:ok,[{0,"Ak-47"},{1,"M4A4"},{2,"AWP"}]}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -121,10 +121,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #List all weapons from category 5 that doesnt exist
     test "List Weapons of Category 5" do
       pid = self()
-      spawn(fn -> FilterList.list_weapons(pid, :test, 5) end)
+      spawn(fn -> FilterList.list_weapons(pid, 5) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid category or No weapons for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -134,10 +134,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #List all skins from weapon 0
     test "List Skins of Weapon 0" do
       pid = self()
-      spawn(fn -> FilterList.list_skins(pid, :test, 0) end)
+      spawn(fn -> FilterList.list_skins(pid, 0) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:ok,[{0, "Vulcan"}, {1, "Redline"}]}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -147,10 +147,10 @@ defmodule AuctionSystemTest.Tasks.FilterListTest do
     #List all skins from weapon 4 that doesnt exist
     test "List Skins of Weapon 4" do
       pid = self()
-      spawn(fn -> FilterList.list_skins(pid, :test, 4) end)
+      spawn(fn -> FilterList.list_skins(pid, 4) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid weapon or No skins for that weapon"}
 
         after 1000 -> refute "timeout" == "timeout"
