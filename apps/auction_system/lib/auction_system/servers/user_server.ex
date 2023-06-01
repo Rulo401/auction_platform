@@ -1,10 +1,12 @@
 defmodule AuctionSystem.Servers.UserServer do
   use GenServer
-
   alias AuctionSystem.Schemas.User
   alias AuctionSystem.Repo
 
-  @spec init(any) :: {:ok, map}
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  end
+
   def init(_) do
     db_users =  User |> Repo.all
     users = Map.new(db_users, fn x -> {x.nickname, x.id} end)
