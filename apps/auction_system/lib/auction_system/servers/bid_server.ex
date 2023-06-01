@@ -1,7 +1,7 @@
 defmodule AuctionSystem.Servers.BidServer do
   use GenServer
 
-  def start_link({supervisor}) do
+  def start_link([supervisor]) do
     GenServer.start_link(__MODULE__, supervisor, name: __MODULE__)
   end
 
