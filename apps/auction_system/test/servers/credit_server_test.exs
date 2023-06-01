@@ -25,26 +25,6 @@ defmodule AuctionSystemTest.Servers.CreditServerTest do
     {:ok, %{users: users_state,server: pid, init_size: init_size}}
   end
 
-  #setup_all do
-  #  # Create four users for testing
-  #  users = [
-  #   user1: %User{nickname: "TestUser1", balance: 20.0},
-  #   user2: %User{nickname: "TestUser2"},
-  #   user3: %User{nickname: "TestUser3"}
-  #  ]
-#
-  #  # Save the user records to the database
-  #  users_state = users
-  #  |> Enum.map(fn {k,u} ->
-  #     {:ok, user} = Repo.insert(u)
-  #     {k,user}
-  #  end)
-  #  |> Map.new()
-#
-  #  # Return the server and users
-  #  {:ok, %{users: users_state}}
-  #end
-
   test "Balance", state do
     # Get the first user from the setup
     user1 = Map.get(state.users, :user1)
