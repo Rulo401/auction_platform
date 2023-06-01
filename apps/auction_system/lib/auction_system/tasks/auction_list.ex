@@ -5,12 +5,17 @@ defmodule AuctionSystem.Tasks.AuctionList do
   import Ecto.Query
 
   def list_auctions(pid, cid, :all) do
-    response = case Repo.all(from a in Auction, select: a.id, order_by: [asc: a.id]) do
-      [] ->
-        {:error, "No auctions listed"}
-      auctions ->
-        {:ok, auctions}
-    end
+    query = from a in Auction, select: a.id, order_by: [asc: a.id]
+    stream = Repo.stream(query)
+    transaction = Repo.transaction(fn -> Enum.to_list(stream) end)
+
+    response =
+      case transaction do
+        {_, []} ->
+          {:error, "No auctions listed"}
+        {_, stream} ->
+          {:ok, stream}
+      end
     send(pid, {:market, cid, response})
   end
 
@@ -23,13 +28,18 @@ defmodule AuctionSystem.Tasks.AuctionList do
         where: w.category_id == ^category_id,
         select: a.id
       )
-    response = case Repo.all(query) do
-      [] ->
-        {:error, "Invalid category or No auctions listed for that category"}
-      auctions ->
-        {:ok, auctions}
-    end
-    send(pid, {:market, cid, response})
+
+    stream = Repo.stream(query)
+    transaction = Repo.transaction(fn -> Enum.to_list(stream) end)
+
+    response =
+      case transaction do
+        {_, []} ->
+          {:error, "Invalid category or No auctions listed for that category"}
+        {_, auctions} ->
+          {:ok, auctions}
+      end
+      send(pid, {:market, cid, response})
   end
 
   def list_auctions(pid, cid, :weapon, weapon_id) do
@@ -40,13 +50,18 @@ defmodule AuctionSystem.Tasks.AuctionList do
         where: s.weapon_id == ^weapon_id,
         select: a.id
       )
-    response = case Repo.all(query) do
-      [] ->
-        {:error, "Invalid weapon or No auctions listed for that weapon"}
-      auctions ->
-        {:ok, auctions}
-    end
-    send(pid, {:market, cid, response})
+
+    stream = Repo.stream(query)
+    transaction = Repo.transaction(fn -> Enum.to_list(stream) end)
+
+    response =
+      case transaction do
+        {_, []} ->
+          {:error, "Invalid weapon or No auctions listed for that weapon"}
+        {_, auctions} ->
+          {:ok, auctions}
+      end
+      send(pid, {:market, cid, response})
   end
 
   def list_auctions(pid, cid, :skin, skin_id) do
@@ -56,12 +71,17 @@ defmodule AuctionSystem.Tasks.AuctionList do
         where: i.skin_id== ^skin_id,
         select: a.id
       )
-    response = case Repo.all(query) do
-      [] ->
-        {:error, "Invalid skin or No auctions listed for that skin"}
-      auctions ->
-        {:ok, auctions}
-    end
-    send(pid, {:market, cid, response})
+
+    stream = Repo.stream(query)
+    transaction = Repo.transaction(fn -> Enum.to_list(stream) end)
+
+    response =
+      case transaction do
+        {_, []} ->
+          {:error, "Invalid skin or No auctions listed for that skin"}
+        {_, auctions} ->
+          {:ok, auctions}
+      end
+      send(pid, {:market, cid, response})
   end
 end
