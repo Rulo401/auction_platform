@@ -14,26 +14,22 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
     init_size = length(User |> Repo.all)
 
     #Create user with invalid username
-    {status, err} = GenServer.call(state.server,{:create, 14},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:create, 14},:infinity)
     assert :error == status
 
     #Create user1
-    {status, id} = GenServer.call(state.server,{:create, "User1"},:infinity)
-    IO.puts("ID : #{inspect(id)}")
+    {status, _} = GenServer.call(state.server,{:create, "User1"},:infinity)
     assert :ok == status
 
     #Check the size of the database
     assert init_size + 1 == length(User |> Repo.all)
 
     #Recreate user1
-    {status, err} = GenServer.call(state.server,{:create, "User1"},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:create, "User1"},:infinity)
     assert :error == status
 
     #Create user2
-    {status, id} = GenServer.call(state.server,{:create, "User2"},:infinity)
-    IO.puts("ID : #{inspect(id)}")
+    {status, _} = GenServer.call(state.server,{:create, "User2"},:infinity)
     assert :ok == status
 
     #Check the size of the database
@@ -44,16 +40,14 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
     init_size = length(User |> Repo.all)
 
     #Delete user who does not exist
-    {status, err} = GenServer.call(state.server,{:delete, "User1"},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:delete, "User1"},:infinity)
     assert :error == status
 
     #Check the size of the database
     assert init_size == length(User |> Repo.all)
 
     #Insert user for test
-    {status, id} = GenServer.call(state.server,{:create, "User1"},:infinity)
-    IO.puts("ID : #{inspect(id)}")
+    {status, _} = GenServer.call(state.server,{:create, "User1"},:infinity)
     assert :ok == status
 
     #Check the size of the database
@@ -67,7 +61,6 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
 
     #Insert user for test
     {status, id} = GenServer.call(state.server,{:create, "User2"},:infinity)
-    IO.puts("ID : #{inspect(id)}")
     assert :ok == status
     #Update user with balance
     User
@@ -76,14 +69,12 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
     |> Repo.update()
 
     #Delete user with balance
-    {status, err} = GenServer.call(state.server,{:delete, "User2"},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:delete, "User2"},:infinity)
     assert :error == status
 
 
     #Insert user for test
     {status, id} = GenServer.call(state.server,{:create, "User3"},:infinity)
-    IO.puts("ID : #{inspect(id)}")
     assert :ok == status
     #Update user with freezed balance
     User
@@ -92,8 +83,7 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
     |> Repo.update()
 
     #Delete user with freezed balance
-    {status, err} = GenServer.call(state.server,{:delete, "User3"},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:delete, "User3"},:infinity)
     assert :error == status
 
     #Check the size of the database
@@ -104,8 +94,7 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
     init_size = length(User |> Repo.all)
 
     #Login user who does not exist
-    {status, err} = GenServer.call(state.server,{:login, "User1"},:infinity)
-    IO.puts("Error: #{inspect(err)}")
+    {status, _} = GenServer.call(state.server,{:login, "User1"},:infinity)
     assert :error == status
 
     #Check the size of the database
@@ -113,7 +102,6 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
 
     #Create user1
     {status, idc} = GenServer.call(state.server,{:create, "User1"},:infinity)
-    IO.puts("ID : #{inspect(idc)}")
     assert :ok == status
 
     #Check the size of the database
@@ -121,7 +109,6 @@ defmodule AuctionSystemTest.Servers.UserServerTest do
 
     #Login user1
     {status, idl} = GenServer.call(state.server,{:login, "User1"},:infinity)
-    IO.puts("ID : #{inspect(idl)}")
     assert :ok == status
 
     #Check the size of the database
