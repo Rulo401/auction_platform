@@ -3,6 +3,18 @@ defmodule AuctionSystem.Jobs.Paymaster do
   alias AuctionSystem.Repo
   import Ecto.Query
 
+  def child_spec(_) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [[]]},
+      restart: :permanent
+    }
+  end
+
+  def start_link(_) do
+    {:ok, spawn_link( fn () -> run(60000) end)}
+  end
+
   def start_paymaster(timeout) when is_integer(timeout) do
     spawn(fn () -> run(timeout) end)
   end
