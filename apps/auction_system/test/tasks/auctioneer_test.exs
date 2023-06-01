@@ -6,17 +6,14 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
 
   describe "Testing wrong calls" do
     test "Invalid pids" do
-      pid = self()
-
-      assert {:error, "Invalid client or manager pid"} == Auctioneer.bid(:wrong_pid, pid, :pet, nil)
-      assert {:error, "Invalid client or manager pid"} == Auctioneer.bid(pid, :wrong_pid, :pet, nil)
-      assert {:error, "Invalid client or manager pid"} == Auctioneer.bid(:wrong_pid, :wrong_pid, :pet, nil)
+      assert {:error, "Invalid manager pid"} == Auctioneer.bid(:from, "pid", nil)
+      assert {:error, "Invalid manager pid"} == Auctioneer.bid(:from, :wrong_pid, nil)
     end
 
     test "Invalid ids" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {"0", 1, 10.0}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {"0", 1, 10.0}) end)
 
       receive do
         {:free, id} ->
@@ -31,7 +28,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
           refute "TIMEOUT" == "TIMEOUT"
       end
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {0, "1", 10.0}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {0, "1", 10.0}) end)
 
       receive do
         {:free, id} ->
@@ -50,7 +47,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Invalid bids" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {0, 1, "10.0"}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {0, 1, "10.0"}) end)
 
       receive do
         {:free, id} ->
@@ -65,7 +62,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
           refute "TIMEOUT" == "TIMEOUT"
       end
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {0, 1, -1.2}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {0, 1, -1.2}) end)
 
       receive do
         {:free, id} ->
@@ -80,7 +77,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
           refute "TIMEOUT" == "TIMEOUT"
       end
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {0, 2, 0.0}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {0, 2, 0.0}) end)
 
       receive do
         {:free, id} ->
@@ -140,7 +137,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Pujar una cantidad mayor al balance" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {1, 2, 1.1}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {1, 2, 1.1}) end)
 
       receive do
         {:free, id} ->
@@ -159,7 +156,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Pujar en una subasta cerrada" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {2, 0, 10.0}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {2, 0, 10.0}) end)
 
       receive do
         {:free, id} ->
@@ -178,7 +175,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Pujar una cantidad menor a la puja minima" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {1, 1, 0.4}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {1, 1, 0.4}) end)
 
       receive do
         {:free, id} ->
@@ -197,7 +194,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Pujar una cantidad menor a la puja actual" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {1, 2, 0.4}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {1, 2, 0.4}) end)
 
       receive do
         {:free, id} ->
@@ -216,7 +213,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
     test "Pujar correctamente" do
       pid = self()
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {1, 2, 0.6}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {1, 2, 0.6}) end)
 
       receive do
         {:free, id} ->
@@ -247,7 +244,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
       assert user2.balance == 50.1
       assert user2.freezed == 0.0
 
-      spawn(fn -> Auctioneer.bid(pid, pid, :test, {2, 1, 50.1}) end)
+      spawn(fn -> Auctioneer.bid(pid, pid, {2, 1, 50.1}) end)
 
       receive do
         {:free, id} ->

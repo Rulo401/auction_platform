@@ -3,14 +3,19 @@ defmodule AuctionSystem.Tasks.Auctioneer do
   alias AuctionSystem.Repo
   import Ecto.Query
 
-  def bid(client_pid, manager_pid, _, _) when not is_pid(client_pid) or not is_pid(manager_pid) do
-    {:error, "Invalid client or manager pid"}
+  def bid(_, manager_pid, _) when not is_pid(manager_pid) do
+    {:error, "Invalid manager pid"}
   end
 
-  def bid(client_pid, manager_pid, call_id, {user_id, auction_id, bid}) do
+  def bid(from, manager_pid, {user_id, auction_id, bid}) do
     response = process_bid({user_id, auction_id, bid})
     send(manager_pid, {:free, auction_id})
-    send(client_pid,{call_id, response})
+    cond do
+      is_pid(from) ->
+        send(from,{:test, response})
+      true ->
+        GenServer.reply(from, response)
+    end
   end
 
   defp process_bid({user_id, auction_id, _}) when not is_integer(user_id) or not is_integer(auction_id) do
@@ -37,14 +42,13 @@ defmodule AuctionSystem.Tasks.Auctioneer do
   end
 
   defp bid_transaccion({user_id, auction_id, bid}) do
-    case User |> Repo.get(user_id) do
+    case Repo.one from u in User, where: u.id == ^user_id, lock: fragment("FOR UPDATE OF ?", u) do
       user when user.balance >= bid ->
-        case Repo.one(from a in Auction, where: a.id == ^auction_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second")) do
+        case Repo.one from a in Auction, where: a.id == ^auction_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second") do
           nil ->
             Repo.rollback(:auction_not_found)
           auc when auc.bid < bid ->
-            #prev_bidder = auc.bidder |> User.changeset(%{balance: auc.bidder.balance + auc.bid, freezed: auc.bidder.freezed - auc.bid})
-            prev_bidder = User |> Repo.get(auc.bidder_id)
+            prev_bidder = Repo.one from u in User, where: u.id == ^auc.bidder_id
             case prev_bidder do
               nil ->
                 Repo.rollback(:update_error)
