@@ -39,7 +39,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-      send(pid, {:market, cid, response})
+    send(pid, {:market, cid, response})
   end
 
   def list_auctions(pid, cid, :weapon, weapon_id) do
@@ -61,7 +61,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-      send(pid, {:market, cid, response})
+    send(pid, {:market, cid, response})
   end
 
   def list_auctions(pid, cid, :skin, skin_id) do
@@ -82,6 +82,6 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-      send(pid, {:market, cid, response})
+    send(pid, {:market, cid, response})
   end
 end
