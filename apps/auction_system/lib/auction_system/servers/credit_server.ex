@@ -5,12 +5,17 @@ defmodule AuctionSystem.Servers.CreditServer do
   alias Ecto.Multi
   import Ecto.Query
 
-  @spec init(any) :: {:ok, nil}
-  def init(_) do
-    {:ok, nil}
+  def start_link([supervisor]) do
+    GenServer.start_link(__MODULE__, supervisor, name: __MODULE__)
   end
 
-  def handle_call({:deposit, user_id, amount}, _, state) when amount > 0 do
+  @impl true
+  def init(supervisor) do
+    {:ok, supervisor}
+  end
+
+  @impl true
+  def handle_call({:deposit, user_id, amount}, _, supervisor) when amount > 0 do
     transaction = Multi.new()
     |> Multi.one(:user, (from u in User, where: u.id == ^user_id))
     |> Multi.update(:deposit, fn %{user: user} -> Ecto.Changeset.change(user, balance: user.balance + amount) end)
@@ -18,41 +23,67 @@ defmodule AuctionSystem.Servers.CreditServer do
 
     case transaction do
       {:ok, changes} ->
-        {:reply, {:ok, changes.user.balance + amount}, state}
+        {:reply, {:ok, changes.user.balance + amount}, supervisor}
       {:error, _, _, _} ->
-        {:reply, {:error, "Database error"}, state}
+        {:reply, {:error, "Database error"}, supervisor}
     end
   end
 
-  def handle_call({:deposit, _user_id, _amount}, _, state) do
-    {:reply, {:error, "Deposit amount must be a positive integer"}, state}
+  def handle_call({:deposit, _user_id, _amount}, _, supervisor) do
+    {:reply, {:error, "Deposit amount must be a positive integer"}, supervisor}
   end
 
-  def handle_call({:withdraw, user_id, amount}, _, state) when amount > 0 do
+  def handle_call({:withdraw, user_id, amount}, _, supervisor) when amount > 0 do
     case Repo.transaction(fn() -> withdraw_transaction(user_id,amount) end) do
       {:ok, {:ok, user}} ->
         balance = user.balance
-        {:reply, {:ok, balance}, state}
+        {:reply, {:ok, balance}, supervisor}
 
       {:ok,{:error,:insufficient_balance}} ->
-          {:reply, {:error, "Insufficient balance"}, state}
+          {:reply, {:error, "Insufficient balance"}, supervisor}
 
       {:ok,{:error, _}} ->
-        {:reply, {:error, "Database error"}, state}
+        {:reply, {:error, "Database error"}, supervisor}
 
     end
   end
 
-  def handle_call({:withdraw, _user_id, _amount}, _, state) do
-    {:reply, {:error, "Withdraw amount must be a positive integer"}, state}
+  def handle_call({:withdraw, _user_id, _amount}, _, supervisor) do
+    {:reply, {:error, "Withdraw amount must be a positive integer"}, supervisor}
   end
 
-  def handle_call({:balance, user_id}, _, state) do
+  def handle_call({:balance, user_id}, _, nil) do
     case User |> Repo.get(user_id) do
       nil ->
-        {:reply,{:error,"User not found"}, state}
+        {:reply,{:error,"User not found"}, nil}
       user ->
-        {:reply, {:ok, user.balance}, state}
+        {:reply, {:ok, user.balance}, nil}
+    end
+  end
+
+  def handle_call({:balance, user_id}, from, supervisor) do
+    list = Supervisor.which_children(supervisor)
+    ds = Enum.find_value(list, fn x -> find_ds(x) end)
+    DynamicSupervisor.start_child(ds, %{ id: CreditServer, start: {CreditServer, :balance, [from, user_id]}})
+    {:noreply, supervisor}
+  end
+
+  def balance(from, user_id) do
+    response = case User |> Repo.get(user_id) do
+      nil ->
+        {:error,"User not found"}
+      user ->
+        {:ok, user.balance}
+    end
+    GenServer.reply(from, response)
+  end
+
+  defp find_ds(x) do
+    case x do
+      {:balance_ds, child, :worker, _} ->
+        child
+      _ ->
+        false
     end
   end
 
