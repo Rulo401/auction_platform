@@ -5,4 +5,7 @@ config :auction_system, AuctionSystem.Repo,
   username: "auction_system",
   password: "auction_system",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool: Ecto.Adapters.SQL.Sandbox,
+  log: :info
+
+  config :logger, level: :warn

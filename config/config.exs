@@ -24,4 +24,6 @@ config :auction_system, AuctionSystem.Repo,
 
 config :auction_system, ecto_repos: [AuctionSystem.Repo]
 
+config :logger, level: :warn
+
 import_config "#{config_env()}.exs"
