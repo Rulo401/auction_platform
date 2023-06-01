@@ -30,7 +30,7 @@ defmodule AuctionSystem.Servers.CreditServer do
   end
 
   def handle_call({:deposit, _user_id, _amount}, _, supervisor) do
-    {:reply, {:error, "Deposit amount must be a positive integer"}, supervisor}
+    {:reply, {:error, "Deposit amount must be a positive float"}, supervisor}
   end
 
   def handle_call({:withdraw, user_id, amount}, _, supervisor) when amount > 0 do
@@ -49,7 +49,7 @@ defmodule AuctionSystem.Servers.CreditServer do
   end
 
   def handle_call({:withdraw, _user_id, _amount}, _, supervisor) do
-    {:reply, {:error, "Withdraw amount must be a positive integer"}, supervisor}
+    {:reply, {:error, "Withdraw amount must be a positive float"}, supervisor}
   end
 
   def handle_call({:balance, user_id}, _, nil) do
