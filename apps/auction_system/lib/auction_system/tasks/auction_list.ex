@@ -4,8 +4,8 @@ defmodule AuctionSystem.Tasks.AuctionList do
   alias AuctionSystem.Repo
   import Ecto.Query
 
-  def list_auctions(pid, cid, :all) do
-    query = from a in Auction, select: a.id, order_by: [asc: a.id]
+  def list_auctions(from, :all) do
+    query = from a in Auction, where: a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second"), select: a.id, order_by: [asc: a.id]
     stream = Repo.stream(query)
     transaction = Repo.transaction(fn -> Enum.to_list(stream) end)
 
@@ -16,16 +16,16 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, stream} ->
           {:ok, stream}
       end
-    send(pid, {:market, cid, response})
+    answer(from, response)
   end
 
-  def list_auctions(pid, cid, :category, category_id) do
+  def list_auctions(from, :category, category_id) do
     query =
       from(a in Auction,
         join: i in Item, on: a.item_id == i.id,
         join: s in Skin, on: i.skin_id == s.id,
         join: w in Weapon, on: s.weapon_id == w.id,
-        where: w.category_id == ^category_id,
+        where: w.category_id == ^category_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second"),
         select: a.id
       )
 
@@ -39,15 +39,15 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-    send(pid, {:market, cid, response})
+    answer(from, response)
   end
 
-  def list_auctions(pid, cid, :weapon, weapon_id) do
+  def list_auctions(from, :weapon, weapon_id) do
     query =
       from(a in Auction,
         join: i in Item, on: a.item_id == i.id,
         join: s in Skin, on: i.skin_id == s.id,
-        where: s.weapon_id == ^weapon_id,
+        where: s.weapon_id == ^weapon_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second"),
         select: a.id
       )
 
@@ -61,14 +61,14 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-    send(pid, {:market, cid, response})
+    answer(from, response)
   end
 
-  def list_auctions(pid, cid, :skin, skin_id) do
+  def list_auctions(from, :skin, skin_id) do
     query =
       from(a in Auction,
         join: i in Item, on: a.item_id == i.id,
-        where: i.skin_id== ^skin_id,
+        where: i.skin_id== ^skin_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second"),
         select: a.id
       )
 
@@ -82,6 +82,14 @@ defmodule AuctionSystem.Tasks.AuctionList do
         {_, auctions} ->
           {:ok, auctions}
       end
-    send(pid, {:market, cid, response})
+    answer(from, response)
+  end
+
+  defp answer(from, response) when is_pid(from) do
+    send(from, {:test, response})
+  end
+
+  defp answer(from, response) do
+    GenServer.reply(from, response)
   end
 end

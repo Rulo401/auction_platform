@@ -21,10 +21,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions in the DB
     test "No Auctions listed" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :all) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :all) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "No auctions listed"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -34,10 +34,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions by a category thats not in the DB
     test "No Auctions for Invalid category" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 1) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :category, 1) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid category or No auctions listed for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -47,10 +47,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions by a weapon thats not in the DB
     test "No Auctions for Invalid weapon" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :weapon, 0) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :weapon, 0) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid weapon or No auctions listed for that weapon"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -60,10 +60,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions by a skin thats not in the DB
     test "No Auctions for Invalid skin" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 1) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :skin, 1) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid skin or No auctions listed for that skin"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -120,11 +120,11 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions in the DB
     test "Listed Auctions" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :all) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :all) end)
 
       receive do
-        {:market, :test, response} ->
-          assert response == {:ok,[0,1,2]}
+        {:test, response} ->
+          assert response == {:ok,[2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -133,11 +133,11 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions with weapon from category 2
     test "Listed Auctions by Category 2" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 2) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :category, 2) end)
 
       receive do
-        {:market, :test, response} ->
-          assert response == {:ok,[0,1,2]}
+        {:test, response} ->
+          assert response == {:ok,[2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -146,10 +146,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions with weapon from category 4 that doesnt exist
     test "Listed Auctions by Category 4" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :category, 4) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :category, 4) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid category or No auctions listed for that category"}
 
         after 1000 -> refute "timeout" == "timeout"
@@ -159,11 +159,11 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions with weapon 0
     test "Listed Auctions by Weapon 0" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :weapon, 0) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :weapon, 0) end)
 
       receive do
-        {:market, :test, response} ->
-          assert response == {:ok,[0,1,2]}
+        {:test, response} ->
+          assert response == {:ok,[2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -172,24 +172,24 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions with weapon 7 that doesnt exist
     test "Listed Auctions by Weapon 7" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :weapon, 7) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :weapon, 7) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid weapon or No auctions listed for that weapon"}
 
         after 1000 -> refute "timeout" == "timeout"
       end
     end
 
-    #Lists all auctions with skin 0
-    test "Listed Auctions by Skin 0" do
+    #Lists all auctions with skin 1
+    test "Listed Auctions by Skin 1" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 0) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :skin, 1) end)
 
       receive do
-        {:market, :test, response} ->
-          assert response == {:ok,[0,1]}
+        {:test, response} ->
+          assert response == {:ok,[2]}
 
         after 1000 -> refute "timeout" == "timeout"
       end
@@ -198,10 +198,10 @@ defmodule AuctionSystemTest.Tasks.AuctionListTest do
     #Lists all auctions with skin 3 that doesnt exist
     test "Listed Auctions by Skin 3" do
       pid = self()
-      spawn(fn -> AuctionList.list_auctions(pid, :test, :skin, 3) end)
+      spawn(fn -> AuctionList.list_auctions(pid, :skin, 3) end)
 
       receive do
-        {:market, :test, response} ->
+        {:test, response} ->
           assert response == {:error, "Invalid skin or No auctions listed for that skin"}
 
         after 1000 -> refute "timeout" == "timeout"
