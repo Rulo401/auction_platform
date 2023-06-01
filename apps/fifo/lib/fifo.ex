@@ -1,14 +1,21 @@
 defmodule Fifo do
   use GenServer
 
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  @impl true
   def init(_) do
     {:ok, []}
   end
 
+  @impl true
   def handle_cast({:push, element}, state) do
     {:noreply, state ++ [element]}
   end
 
+  @impl true
   def handle_call(:pull, _from, []) do
     {:reply, nil, []}
   end
