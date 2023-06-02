@@ -1,17 +1,24 @@
 defmodule AuctionSystem.Servers.MarketServer do
   use GenServer
   alias AuctionSystem.Tasks.{FilterList, AuctionList, AuctionManager}
+  @type list_by() :: {:list_weapons, integer} | {:list_skins, integer}
+  @type item() ::  %{skin_id: integer, seed: integer, sfloat: float}
+  @type auction_item() :: {:auction_item, user_id :: integer, item :: item(), days :: integer, minBid :: float} | {:auction_item, user_id :: integer, item :: item(), days :: integer}
+  @type method() :: :list_category | list_by() | {:list_auction,:all} | {:list_auctions, atom(), integer} | auction_item() | {:auction_data, integer}
 
+  @spec start_link([Supervisor.supervisor()]) :: {:ok, pid}
   def start_link([supervisor]) do
     GenServer.start_link(__MODULE__, supervisor, name: __MODULE__)
   end
 
   @impl true
+  @spec init(Supervisor.supervisor()) :: {:ok, Supervisor.supervisor()}
   def init(supervisor) do
     {:ok, supervisor}
   end
 
   @impl true
+  @spec handle_call(method(), GenServer.from(), Supervisor.supervisor()) :: {:noreply, Supervisor.supervisor()}
   def handle_call(:list_category, from, supervisor) do
     DynamicSupervisor.start_child(find_ds(supervisor), %{ id: FilterList, start: {FilterList, :list_categories, [from]}})
     {:noreply, supervisor}
