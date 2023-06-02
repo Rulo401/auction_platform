@@ -71,8 +71,26 @@ defmodule AuctionSystemTest.Supervisors.MarketSupervisorTest do
   end
 
   ## Tests de listar subastas
+  test "List all auctions" do
+    assert GenServer.call(MarketServer, {:list_auctions, :all}) == {:ok,[2]}
+  end
 
-  ###
+  test "List auctions by category" do
+    assert GenServer.call(MarketServer, {:list_auctions, :category, 2}) == {:ok,[2]}
+    assert GenServer.call(MarketServer, {:list_auctions, :category, 4}) == {:error, "Invalid category or No auctions listed for that category"}
+  end
+
+  test "List auctions by weapon" do
+    assert GenServer.call(MarketServer, {:list_auctions, :weapon, 0}) == {:ok,[2]}
+
+    assert GenServer.call(MarketServer, {:list_auctions, :weapon, 7}) == {:error, "Invalid weapon or No auctions listed for that weapon"}
+  end
+
+  test "List auctions by skin" do
+    assert GenServer.call(MarketServer, {:list_auctions, :skin, 1}) == {:ok,[2]}
+
+    assert GenServer.call(MarketServer, {:list_auctions, :skin, 3}) == {:error, "Invalid skin or No auctions listed for that skin"}
+  end
 
   test "Auction item: Invalid queries" do
     #Invalid duration
