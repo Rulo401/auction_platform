@@ -57,7 +57,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
       end
       receive do
         {:test, response} ->
-          assert response == {:error, "Bid must be a positive float"}
+          assert response == {:error, "Bid must be a positive number"}
         after 5000 ->
           refute "TIMEOUT" == "TIMEOUT"
       end
@@ -72,7 +72,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
       end
       receive do
         {:test, response} ->
-          assert response == {:error, "Bid must be a positive float"}
+          assert response == {:error, "Bid must be a positive number"}
         after 5000 ->
           refute "TIMEOUT" == "TIMEOUT"
       end
@@ -87,7 +87,7 @@ defmodule AuctionSystemTest.Tasks.AuctioneerTest do
       end
       receive do
         {:test, response} ->
-          assert response == {:error, "Bid must be a positive float"}
+          assert response == {:error, "Bid must be a positive number"}
         after 5000 ->
           refute "TIMEOUT" == "TIMEOUT"
       end
