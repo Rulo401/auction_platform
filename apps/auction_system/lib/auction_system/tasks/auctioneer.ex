@@ -22,8 +22,8 @@ defmodule AuctionSystem.Tasks.Auctioneer do
     {:error, "User_id and auction_id must be integers"}
   end
 
-  defp process_bid({_, _, bid}) when not is_float(bid) or bid <= 0 do
-    {:error, "Bid must be a positive float"}
+  defp process_bid({_, _, bid}) when not is_number(bid) or bid <= 0 do
+    {:error, "Bid must be a positive number"}
   end
 
   defp process_bid({user_id, auction_id, bid}) do

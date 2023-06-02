@@ -100,9 +100,9 @@ defmodule AuctionSystemTest.Supervisors.MarketSupervisorTest do
     assert GenServer.call(MarketServer, {:auction_item, 0, item, 0}) == {:error, "Duration days must be a positive integer"}
 
     #Invalid minBid
-    assert GenServer.call(MarketServer, {:auction_item, 0, item, 2, "five"}) == {:error, "The min bid must be float and greater than or equal to 0.1"}
+    assert GenServer.call(MarketServer, {:auction_item, 0, item, 2, "five"}) == {:error, "The min bid must be a number greater than or equal to 0.1"}
 
-    assert GenServer.call(MarketServer, {:auction_item, 0, item, 2, 0.09}) == {:error, "The min bid must be float and greater than or equal to 0.1"}
+    assert GenServer.call(MarketServer, {:auction_item, 0, item, 2, 0.09}) == {:error, "The min bid must be a number greater than or equal to 0.1"}
 
     #Invalid item definition
     item = %{skin_id: 0, seed: "20", sfloat: 0.13}

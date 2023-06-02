@@ -10,8 +10,8 @@ defmodule AuctionSystem.Tasks.AuctionManager do
     answer(from,{:error, "Duration days must be a positive integer"})
   end
 
-  def auction_item(from, _, _, _, minBid) when not is_float(minBid) or minBid < 0.1 do
-    answer(from,{:error, "The min bid must be float and greater than or equal to 0.1"})
+  def auction_item(from, _, _, _, minBid) when not is_number(minBid) or minBid < 0.1 do
+    answer(from,{:error, "The min bid must be a number greater than or equal to 0.1"})
   end
 
   def auction_item(from, user_id, item_def, days, minBid) do

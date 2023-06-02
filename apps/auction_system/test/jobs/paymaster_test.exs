@@ -45,8 +45,7 @@ defmodule AuctionSystemTest.Jobs.PaymasterTest do
   end
 
   test "pay_now" do
-    {status, _} = Paymaster.pay_now()
-    assert status == :ok
+    assert Paymaster.pay_now() == {:ok, "2 changes has been done"}
 
     seller = User |> Repo.get(0)
     assert seller.balance == 27.2
