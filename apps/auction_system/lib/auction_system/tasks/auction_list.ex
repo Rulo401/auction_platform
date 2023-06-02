@@ -91,6 +91,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
 
   defp answer(from, response) when is_pid(from) do
     send(from, {:test, response})
+    :ok
   end
 
   defp answer(from, response) do
