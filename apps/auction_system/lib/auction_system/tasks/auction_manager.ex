@@ -3,22 +3,20 @@ defmodule AuctionSystem.Tasks.AuctionManager do
   alias AuctionSystem.Schemas.{Auction, Item, Skin}
   @type item() ::  %{skin_id: integer, seed: integer, sfloat: float}
 
-  @spec auction_item(from :: pid() | GenServer.from(), user_id :: integer, item_def :: item(), days :: integer) :: :ok
+ @spec auction_item(from :: pid() | GenServer.from(), user_id :: integer, item_def :: item(), days :: integer) :: :ok
   def auction_item(from, user_id, item_def, days) do
     auction_item(from, user_id, item_def, days, 0.1)
   end
 
-  @spec auction_item(from :: pid() | GenServer.from(), any, any :: item(), days :: integer, any) :: :ok
+  @spec auction_item(from :: pid() | GenServer.from(), user_id :: integer, item_def :: item(), days :: integer, minBid :: float) :: :ok
   def auction_item(from, _, _, days, _) when not is_integer(days) or days < 1 do
     answer(from,{:error, "Duration days must be a positive integer"})
   end
 
-  @spec auction_item(from :: pid() | GenServer.from(), any, any :: item(), any, minBid :: float) :: :ok
   def auction_item(from, _, _, _, minBid) when not is_number(minBid) or minBid < 0.1 do
     answer(from,{:error, "The min bid must be a number greater than or equal to 0.1"})
   end
 
-  @spec auction_item(from :: pid() | GenServer.from(), user_id :: integer, item_def :: item(), days :: integer, minBid :: float) :: :ok
   def auction_item(from, user_id, item_def, days, minBid) do
     response = case item_def do
       %{skin_id: sid, seed: seed, sfloat: sfloat} when is_integer(seed) and seed >= 0 and is_float(sfloat) ->
