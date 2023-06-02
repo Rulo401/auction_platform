@@ -20,7 +20,7 @@ defmodule AuctionSystem.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {AuctionSystem.Application, []}
+      mod: {AuctionSystem.Application, Mix.env()}
     ]
   end
 

@@ -6,6 +6,15 @@ defmodule AuctionSystem.Application do
   use Application
 
   @impl true
+  def start(_type, :test) do
+    children = [
+      AuctionSystem.Repo
+    ]
+
+    opts = [strategy: :one_for_one, name: AuctionSystem.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+
   def start(_type, _args) do
     children = [
       AuctionSystem.Repo,
