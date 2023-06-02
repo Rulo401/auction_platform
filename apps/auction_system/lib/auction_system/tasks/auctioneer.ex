@@ -2,7 +2,9 @@ defmodule AuctionSystem.Tasks.Auctioneer do
   alias AuctionSystem.Schemas.{User,Auction}
   alias AuctionSystem.Repo
   import Ecto.Query
+  @type bid() :: {user_id :: integer, auction_id :: integer, bid :: float}
 
+  @spec bid(from :: pid | GenServer.from(), manager :: pid, bid :: bid()) :: :ok
   def bid(_, manager_pid, _) when not is_pid(manager_pid) do
     {:error, "Invalid manager pid"}
   end
@@ -13,6 +15,7 @@ defmodule AuctionSystem.Tasks.Auctioneer do
     cond do
       is_pid(from) ->
         send(from,{:test, response})
+        :ok
       true ->
         GenServer.reply(from, response)
     end
