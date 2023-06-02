@@ -64,6 +64,6 @@ defmodule AuctionSystemTest.Supervisors.BidSupervisorTest do
   test "Pujar correctamente" do
     assert GenServer.call(BidServer,{1, 2, 0.6}) == {:ok, 0.4}
 
-    assert GenServer.cast(BidServer, {2, 1, 50.1}) == {:ok, 0.0}
+    assert GenServer.call(BidServer, {2, 1, 50.1}) == {:ok, 0.0}
   end
 end

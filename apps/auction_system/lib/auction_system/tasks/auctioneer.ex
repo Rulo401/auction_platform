@@ -42,7 +42,7 @@ defmodule AuctionSystem.Tasks.Auctioneer do
   end
 
   defp bid_transaccion({user_id, auction_id, bid}) do
-    case Repo.one from u in User, where: u.id == ^user_id, lock: fragment("FOR UPDATE OF ?", u) do
+    case Repo.one from u in User, where: u.id == ^user_id do
       user when user.balance >= bid ->
         case Repo.one from a in Auction, where: a.id == ^auction_id and a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second") do
           nil ->

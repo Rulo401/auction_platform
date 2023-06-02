@@ -18,7 +18,7 @@ defmodule AuctionSystem.Jobs.BidManager do
     list = Supervisor.which_children(state.supervisor)
     fifo = Enum.find_value(list, fn x -> find_fifo(x) end)
     ds = Enum.find_value(list, fn x -> find_ds(x) end)
-    map = case GenServer.call(fifo,{:seek_backfilling, &(!MapSet.member?(map, &1))}) do
+    map = case GenServer.call(fifo,{:pull_backfilling, &(!MapSet.member?(map, &1))}) do
       {:ok, {from, {user_id, auction_id, bid}}} ->
         pid = self()
         DynamicSupervisor.start_child(ds, %{ id: Auctioneer, start: {Auctioneer, :bid, [from, pid, {user_id, auction_id, bid}]}, restart: :temporary})
