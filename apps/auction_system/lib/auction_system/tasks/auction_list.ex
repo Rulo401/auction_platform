@@ -4,6 +4,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
   alias AuctionSystem.Repo
   import Ecto.Query
 
+  @spec list_auctions(pid | GenServer.from(), :all) :: :ok
   def list_auctions(from, :all) do
     query = from a in Auction, where: a.end > datetime_add(^NaiveDateTime.utc_now(),0,"second"), select: a.id, order_by: [asc: a.id]
     stream = Repo.stream(query)
@@ -19,6 +20,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
     answer(from, response)
   end
 
+  @spec list_auctions(pid | GenServer.from(), :category, category_id :: integer) :: :ok
   def list_auctions(from, :category, category_id) do
     query =
       from(a in Auction,
@@ -42,6 +44,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
     answer(from, response)
   end
 
+  @spec list_auctions(pid | GenServer.from(), :weapon, weapon_id :: integer) :: :ok
   def list_auctions(from, :weapon, weapon_id) do
     query =
       from(a in Auction,
@@ -64,6 +67,7 @@ defmodule AuctionSystem.Tasks.AuctionList do
     answer(from, response)
   end
 
+  @spec list_auctions(pid | GenServer.from(), :skin, skin_id :: integer) :: :ok
   def list_auctions(from, :skin, skin_id) do
     query =
       from(a in Auction,
