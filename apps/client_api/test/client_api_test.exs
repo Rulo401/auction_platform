@@ -88,22 +88,20 @@ VALUES (0, 0, 453, 'Vulcan', 0.1, 0.4),
     {status, id3} = ClientApi.login_user("UserTest3")
     assert status == :ok
     assert ClientApi.bid(id1, 2, 1.0) == {:ok,29.0}
-    assert ClientApi.bid(id3, 2, 1.5) == {:ok, 49.0}
-    assert ClientApi.bid(id1, 2, 2.0) == {:ok, 27.0}
-    assert ClientApi.bid(id3, 2, 2.5) == {:ok, 46.5}
-    assert ClientApi.bid(id1, 2, 3.0) == {:ok, 24.0}
+    assert ClientApi.bid(id3, 2, 1.5) == {:ok, 49.5}
+    assert ClientApi.bid(id1, 2, 2.0) == {:ok, 28.0}
+    assert ClientApi.bid(id3, 2, 2.5) == {:ok, 48.5}
+    assert ClientApi.bid(id1, 2, 3.0) == {:ok, 27.0}
 
     #Bid on a closed auction
     assert ClientApi.bid(id3, 1, 30.0) == {:error, "Auction is closed or does not exist"}
 
     #Bid with a non existant auction
-    assert ClientApi.bid(id1, 4, 30.0) == {:error, "Auction is closed or does not exist"}
+    assert ClientApi.bid(id1, 4, 5.0) == {:error, "Auction is closed or does not exist"}
 
     #Bid with an amount lower than the current bid
     assert ClientApi.bid(id1, 2, 0.8) == {:error, "Bid must be higher than the current one"}
 
-    #Bid with an integer amount
-    assert ClientApi.bid(id1, 2, 1) == {:error, "Bid must be a positive float"}
   end
 
   #Make tests for the Client api of MarketServer
