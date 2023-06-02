@@ -5,17 +5,22 @@ defmodule AuctionSystem.Servers.CreditServer do
   alias Ecto.Multi
   alias AuctionSystem.Tasks.Balance
   import Ecto.Query
+  @type method() :: :deposit | :withdraw | :balance
+  @type amount() :: :float | :integer
 
+  @spec start_link([Supervisor.supervisor()]) :: {:ok, pid()}
   def start_link([supervisor]) do
     GenServer.start_link(__MODULE__, supervisor, name: __MODULE__)
   end
 
   @impl true
+  @spec init(Supervisor.supervisor()) :: {:ok, Supervisor.supervisor()}
   def init(supervisor) do
     {:ok, supervisor}
   end
 
   @impl true
+  @spec handle_call({method(), user_id :: integer, amount :: amount()}, any, Supervisor.supervisor()) :: {:reply, {:ok, new_balance :: amount()}, Superisor.supervisor()}
   def handle_call({:deposit, user_id, amount}, _, supervisor) when amount > 0 do
     transaction = Multi.new()
     |> Multi.one(:user, (from u in User, where: u.id == ^user_id))
