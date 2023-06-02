@@ -12,7 +12,7 @@ defmodule AuctionSystem.Jobs.Paymaster do
   end
 
   def start_link(_) do
-    {:ok, spawn_link( fn () -> run(60000) end)}
+    {:ok, spawn_link( fn () -> run(120000) end)}
   end
 
   def start_paymaster(timeout) when is_integer(timeout) do
@@ -29,12 +29,6 @@ defmodule AuctionSystem.Jobs.Paymaster do
 
   def pay_now() do
     pay_now(:ok, 0)
-   #case Repo.transaction(fn() -> pay_transaction() end) do
-   #  {:ok, _} ->
-   #    :ok
-   #  {:error, _} ->
-   #    {:error, "Database error"}
-   # end
   end
 
   defp pay_now({:error, _}, 0) do
