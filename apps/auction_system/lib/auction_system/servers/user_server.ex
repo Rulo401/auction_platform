@@ -2,17 +2,21 @@ defmodule AuctionSystem.Servers.UserServer do
   use GenServer
   alias AuctionSystem.Schemas.User
   alias AuctionSystem.Repo
+  @type method() :: :create | :delete | :update
 
+  @spec start_link(any) :: Supervisor.on_start()
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
+  @spec init(any) :: {:ok, map()}
   def init(_) do
     db_users =  User |> Repo.all
     users = Map.new(db_users, fn x -> {x.nickname, x.id} end)
     {:ok, users}
   end
 
+  @spec handle_call({method(), username :: String.t() }, any, map()) :: {:reply, {:ok, user_id :: integer}, map()}
   def handle_call({:create, username}, _, state) do
     cond do
       not is_binary(username) ->
