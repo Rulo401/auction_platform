@@ -1,6 +1,7 @@
 defmodule AuctionSystem.Jobs.BidManager do
   alias AuctionSystem.Tasks.Auctioneer
 
+  @spec child_spec(Supervisor.supervisor()) :: Supervisor.child_spec()
   def child_spec(supervisor) do
     %{
       id: __MODULE__,
@@ -9,10 +10,16 @@ defmodule AuctionSystem.Jobs.BidManager do
     }
   end
 
+  @spec start_link(Supervisor.supervisor()) :: {:ok, pid}
   def start_link(supervisor) do
     {:ok, spawn_link(fn () -> manage_bids(%{supervisor: supervisor, map: MapSet.new()}) end)}
   end
 
+  @spec manage_bids(%{
+          :map => MapSet.t(),
+          :supervisor => Supervisor.supervisor(),
+          optional(any) => any
+        }) :: no_return
   def manage_bids(state) do
     map = update_map(state.map)
     list = Supervisor.which_children(state.supervisor)
