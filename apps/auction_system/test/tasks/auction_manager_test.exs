@@ -37,11 +37,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
   test "Auction item: Invalid duration" do
     pid = self()
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13},"1") end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13},"1") end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Duration days must be a positive integer"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -49,11 +48,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
     assert length(Auction |> Repo.all) == 0
 
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 0) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 0) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Duration days must be a positive integer"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -64,11 +62,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
   test "Auction item: Invalid minBid" do
     pid = self()
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 2, "five") end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 2, "five") end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "The min bid must be float and greater than or equal to 0.1"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -76,11 +73,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
     assert length(Auction |> Repo.all) == 0
 
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 2, 0.09) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 2, 0.09) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "The min bid must be float and greater than or equal to 0.1"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -89,11 +85,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
   test "Auction item: Invalid item definition" do
     pid = self()
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: "20", sfloat: 0.13}, 2, 5.0) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: "20", sfloat: 0.13}, 2, 5.0) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Invalid item definition"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -102,11 +97,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
     assert length(Auction |> Repo.all) == 0
     assert length(Item |> Repo.all) == 0
 
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: :fl}, 2, 1.0) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: :fl}, 2, 1.0) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Invalid item definition"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -118,11 +112,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
   test "Auction item: Invalid float for skin" do
     pid = self()
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.09}, 2, 5.0) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.09}, 2, 5.0) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Item float value is lower than the minimum accepted for this skin"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -131,11 +124,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
     assert length(Auction |> Repo.all) == 0
     assert length(Item |> Repo.all) == 0
 
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.42}, 2, 1.0) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.42}, 2, 1.0) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         assert response == {:error, "Item float value is higher than the maximum accepted for this skin"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
@@ -147,11 +139,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
   test "Auction item: Valid query" do
     pid = self()
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 1) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 1) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         {status, _} = response
         assert status == :ok
       after 5000 ->
@@ -178,11 +169,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
   test "Get auction data" do
     pid = self()
 
-    spawn(fn -> AuctionManager.auction_item(pid, :test, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 1) end)
+    spawn(fn -> AuctionManager.auction_item(pid, 0, %{skin_id: 0, seed: 20, sfloat: 0.13}, 1) end)
 
     au_id = receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         {status, au_id} = response
         assert status == :ok
         au_id
@@ -194,11 +184,10 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
     assert length(Auction |> Repo.all) == 1
     assert length(Item |> Repo.all) == 1
 
-    spawn(fn -> AuctionManager.get_auction_data(pid, :test, au_id) end)
+    spawn(fn -> AuctionManager.get_auction_data(pid, au_id) end)
 
     receive do
-      {:market, cid, response} ->
-        assert cid == :test
+      {:test, response} ->
         {status, map} = response
         assert status == :ok
         assert map.weapon == "WeaponTest"
