@@ -3,6 +3,7 @@ defmodule AuctionSystem.Jobs.Paymaster do
   alias AuctionSystem.Repo
   import Ecto.Query
 
+  @spec child_spec(any) :: Supervisor.child_spec()
   def child_spec(_) do
     %{
       id: __MODULE__,
@@ -11,12 +12,19 @@ defmodule AuctionSystem.Jobs.Paymaster do
     }
   end
 
+  @spec start_link(any) :: {:ok, pid}
   def start_link(_) do
     {:ok, spawn_link( fn () -> run(120000) end)}
   end
 
+  @spec start_paymaster(timeout :: integer) :: pid
   def start_paymaster(timeout) when is_integer(timeout) do
     spawn(fn () -> run(timeout) end)
+  end
+
+  @spec pay_now :: {:ok, String.t()}
+  def pay_now() do
+    pay_now(:ok, 0)
   end
 
   defp run(timeout) do
@@ -25,10 +33,6 @@ defmodule AuctionSystem.Jobs.Paymaster do
       after timeout ->
         run(timeout)
     end
-  end
-
-  def pay_now() do
-    pay_now(:ok, 0)
   end
 
   defp pay_now({:error, _}, 0) do
