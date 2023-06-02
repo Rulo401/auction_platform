@@ -33,14 +33,14 @@ defmodule AuctionSystemTest.Supervisors.CreditSupervisorTest do
   test "Deposit" do
     assert GenServer.call(CreditServer, {:deposit, 2, 10}) == {:ok, 59.6}
     assert GenServer.call(CreditServer, {:balance, 2}) == {:ok, 59.6}
-    assert GenServer.call(CreditServer, {:deposit, 0, -1}) == {:error, "Deposit amount must be a positive float"}
+    assert GenServer.call(CreditServer, {:deposit, 0, -1}) == {:error, "Deposit amount must be a positive number"}
     assert GenServer.call(CreditServer, {:balance, 0}) == {:ok, 0.0}
     assert GenServer.call(CreditServer, {:deposit, 0, 1.2}) == {:ok, 1.2}
     assert GenServer.call(CreditServer, {:balance, 0}) == {:ok, 1.2}
   end
 
   test "Withdraw" do
-    assert GenServer.call(CreditServer, {:withdraw, 1, -0.5}) == {:error, "Withdraw amount must be a positive float"}
+    assert GenServer.call(CreditServer, {:withdraw, 1, -0.5}) == {:error, "Withdraw amount must be a positive number"}
     assert GenServer.call(CreditServer, {:withdraw, 1, 1.5}) == {:error, "Insufficient balance"}
     assert GenServer.call(CreditServer, {:withdraw, 1, 1.0}) == {:ok, 0.0}
     assert GenServer.call(CreditServer, {:balance, 1}) == {:ok, 0}

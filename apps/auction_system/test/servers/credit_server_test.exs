@@ -54,7 +54,7 @@ defmodule AuctionSystemTest.Servers.CreditServerTest do
     assert {:ok, 50} == GenServer.call(state.server, {:deposit, user2.id, 50}, :infinity)
 
     # Deposit negative amount into the user1 account
-    assert {:error, "Deposit amount must be a positive float"} == GenServer.call(state.server, {:deposit, user1.id, -25}, :infinity)
+    assert {:error, "Deposit amount must be a positive number"} == GenServer.call(state.server, {:deposit, user1.id, -25}, :infinity)
   end
 
   test "Withdraw", state do
@@ -69,7 +69,7 @@ defmodule AuctionSystemTest.Servers.CreditServerTest do
     assert {:ok, 5} == GenServer.call(state.server, {:withdraw, user1.id, 15}, :infinity)
 
     # Withdraw negative amount into the user1 account
-    assert {:error, "Withdraw amount must be a positive float"} == GenServer.call(state.server, {:withdraw, user1.id, -25}, :infinity)
+    assert {:error, "Withdraw amount must be a positive number"} == GenServer.call(state.server, {:withdraw, user1.id, -25}, :infinity)
 
     # Withdraw amount from the user2 account with insufficient balance
     assert {:error, "Insufficient balance"} == GenServer.call(state.server, {:withdraw, user2.id, 50}, :infinity)
