@@ -66,7 +66,7 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
     receive do
       {:test, response} ->
-        assert response == {:error, "The min bid must be float and greater than or equal to 0.1"}
+        assert response == {:error, "The min bid must be a number greater than or equal to 0.1"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
     end
@@ -77,7 +77,7 @@ defmodule AuctionSystemTest.Tasks.AuctionManagerTest do
 
     receive do
       {:test, response} ->
-        assert response == {:error, "The min bid must be float and greater than or equal to 0.1"}
+        assert response == {:error, "The min bid must be a number greater than or equal to 0.1"}
       after 5000 ->
         refute "TIMEOUT" == "TIMEOUT"
     end
